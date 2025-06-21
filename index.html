@@ -1,60 +1,56 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=89c016416df191d9701137e61554d54c&libraries=services"></script>
-    <style>
-      body { margin: 0; padding: 0; height: 100%; }
-      html { height: 100%; }
-      #map { width: 100%; height: 100%; }
-    </style>
-  </head>
-  <body>
-    <div id="map"></div>
-    <script>
-      // Note: window.ReactNativeWebView.postMessage will only work if the WebView bridge is active
-      // You'll primarily rely on console.log for debugging within the browser dev tools.
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="utf-8">
+        <title>Kakao Map</title>
+        <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=89c016416df191d9701137e61554d54c"></script>
+        <style>
+            html, body {width:100%;height:100vh;margin:0;padding:0;}
+            #map {width:100%;height:100%;}
+        </style>
+    </head>
+    <body>
+        <div id="map" style="width:500px;height:400px;"></div>
+        <script>
+            var mapContainer = document.getElementById('map');
+            var options = {
+              center: new kakao.maps.LatLng(33.450701, 126.570667),
+              level: 3
+            };
+            
+            var map = new kakao.maps.Map(mapContainer, options);
 
-      window.onload = function() {
-        console.log('Kakao Map API script loaded. Checking for kakao object...');
-        if (typeof kakao !== 'undefined' && kakao.maps) {
-          console.log('Kakao Maps is available. Initializing map...');
-          const mapContainer = document.getElementById('map');
-          const mapOption = {
-            center: new kakao.maps.LatLng(37.5665, 126.9780), // These will need to be passed dynamically (see below)
-            level: 3
-          };
-          const map = new kakao.maps.Map(mapContainer, mapOption);
+            // Function to add a marker
+            function addMarker(latitude, longitude, title) {
+                var markerPosition  = new kakao.maps.LatLng(latitude, longitude);
+                var marker = new kakao.maps.Marker({
+                    position: markerPosition
+                });
+                marker.setMap(map);
 
-          const markerPosition = new kakao.maps.LatLng(37.5665, 126.9780);
-          const marker = new kakao.maps.Marker({
-            position: markerPosition
-          });
-          marker.setMap(map);
-          console.log('Map and marker initialized successfully.');
+                // Add infowindow (optional)
+                var iwContent = '<div style="padding:5px;">' + title + '</div>',
+                    iwRemoveable = true;
+                var infowindow = new kakao.maps.InfoWindow({
+                    content : iwContent,
+                    removable : iwRemoveable
+                });
 
-          // Example of sending data back to React Native (if bridge works)
-          if (window.ReactNativeWebView) {
-            window.ReactNativeWebView.postMessage('Map loaded and initialized.');
-          }
+                kakao.maps.event.addListener(marker, 'click', function() {
+                    infowindow.open(map, marker);
+                });
+            }
 
-        } else {
-          console.error('Kakao Maps is not available. SDK might not have loaded or initialized.');
-        }
-      };
+            // Example of adding markers
+            addMarker(33.450701, 126.570667, 'My Location');
 
-      // Handle messages from React Native (e.g., to update coordinates)
-      document.addEventListener('message', function(event) {
-          const data = JSON.parse(event.data);
-          if (data.type === 'updateCoordinates') {
-              if (typeof kakao !== 'undefined' && kakao.maps && map) {
-                  const newCenter = new kakao.maps.LatLng(data.latitude, data.longitude);
-                  map.setCenter(newCenter);
-                  marker.setPosition(newCenter);
-                  console.log('Map center updated to:', data.latitude, data.longitude);
-              }
-          }
-      });
-    </script>
-  </body>
-</html>
+            // Listen for messages from React Native to add dynamic markers
+            // window.ReactNativeWebView.onMessage = (event) => {
+            //     const data = JSON.parse(event.data);
+            //     if (data.type === 'ADD_MARKER') {
+            //         addMarker(data.latitude, data.longitude, data.title);
+            //     }
+            // };
+        </script>
+    </body>
+    </html>
