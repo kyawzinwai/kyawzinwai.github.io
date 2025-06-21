@@ -21,12 +21,12 @@
           console.log('Kakao Maps is available. Initializing map...');
           const mapContainer = document.getElementById('map');
           const mapOption = {
-            center: new kakao.maps.LatLng(${latitude}, ${longitude}), // These will need to be passed dynamically (see below)
+            center: new kakao.maps.LatLng(37.5665, 126.9780), // These will need to be passed dynamically (see below)
             level: 3
           };
           const map = new kakao.maps.Map(mapContainer, mapOption);
 
-          const markerPosition = new kakao.maps.LatLng(${latitude}, ${longitude});
+          const markerPosition = new kakao.maps.LatLng(37.5665, 126.9780);
           const marker = new kakao.maps.Marker({
             position: markerPosition
           });
